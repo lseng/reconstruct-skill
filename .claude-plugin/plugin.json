@@ -14,5 +14,7 @@
     "rea",
     "clean-room"
   ],
-  "skills": "./"
+  "skills": "./",
+  "homepage": "https://github.com/lseng/reconstruct-skill",
+  "repository": "https://github.com/lseng/reconstruct-skill"
 }

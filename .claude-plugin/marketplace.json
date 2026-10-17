@@ -10,7 +10,8 @@
       "name": "reconstruct-skill",
       "description": "Six skills that rebuild an app from evidence: two-tier recon with REA, architecture, build, test, parity diff and a clean-room sweep.",
       "source": "./",
-      "category": "productivity"
+      "category": "productivity",
+      "homepage": "https://github.com/lseng/reconstruct-skill"
     }
   ]
 }

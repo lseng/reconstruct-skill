@@ -42,7 +42,7 @@ Each reads what the last wrote, in a `reconstruct/` folder in your project.
 As a plugin in Claude Code:
 
 ```
-/plugin marketplace add <this repo's git URL or local path>
+/plugin marketplace add lseng/reconstruct-skill
 /plugin install reconstruct-skill@reconstruct-skill
 ```
 
