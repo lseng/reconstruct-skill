@@ -44,38 +44,6 @@ reconstruct/screens/       reference screenshots of the original. Never shipped.
 - **Never someone else's account**, never a password, never past a paywall.
 - **Screenshots are reference.** They stay in `reconstruct/screens/`.
 
-## Step 0: an existing project (retrofit)
-
-Skip this for a new project. If the project already has a rebuild underway,
-and especially if earlier work used REA or copied values before this pack was
-installed, the clean room has to be rebuilt before recon can trust anything.
-
-1. **Inventory.** Search the project for the original's name, REA Evidence
-   IDs, module or class IDs, "via rea" style provenance notes, and exact
-   values attributed to the original. List every file in
-   `reconstruct/retrofit.md` with what it carries.
-2. **Classify each item.** *Behaviour* (what happens, limits, flows, in the
-   project's own words) can stay and moves into `recon.md`. *Verbatim*
-   (exact values with provenance, strings, copy, code, pseudocode, endpoint
-   paths, module IDs) must go.
-3. **Settle the mode for the past work.** If the earlier REA use had a basis,
-   record it in `scope.md` with the date it applied from. If it had none, the
-   earlier evidence is not usable on the clean side. Either the user obtains
-   and records a basis, or those items are re-derived from tier A (public
-   sources, measuring screenshots) and the REA-derived versions are dropped.
-   Do not decide this for the user.
-4. **Quarantine.** Move verbatim material to `reconstruct/evidence/`
-   (gitignored). Replace source comments that cite the original's internals
-   with recon IDs (S07, F03). Values in code that came from the evidence get
-   re-measured or re-chosen and are then marked as your own.
-5. **Say what this does not fix.** Material already committed stays in git
-   history, and anything shipped stays shipped. Tell the user. Whether to
-   rewrite history is their decision, never done automatically.
-6. **Seed the sweep.** Put the identifiers from the inventory into
-   `reconstruct/sweep.json` so `/reconstruct-sweep` catches regressions.
-
-Then continue with Step 1 as normal.
-
 ## Step 1: scope and mode
 
 Ask, or propose answers and get a yes:
