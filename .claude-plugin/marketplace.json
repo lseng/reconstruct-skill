@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "reconstruct-skill",
+  "description": "The reconstruct skill pack for Claude",
+  "owner": {
+    "name": "Leon Eng"
+  },
+  "plugins": [
+    {
+      "name": "reconstruct-skill",
+      "description": "Six skills that rebuild an app from evidence: two-tier recon with REA, architecture, build, test, parity diff and a clean-room sweep.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}

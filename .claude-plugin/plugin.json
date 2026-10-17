@@ -1,0 +1,18 @@
+{
+  "name": "reconstruct-skill",
+  "description": "Six Claude skills that rebuild an app from evidence: two-tier recon (public sources, plus REA on authorized artifacts), architecture, build, test, evidence-checked parity diff, and a clean-room sweep.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Leon Eng"
+  },
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "claude-skills",
+    "reverse-engineering",
+    "reconstruction",
+    "rea",
+    "clean-room"
+  ],
+  "skills": "./"
+}
