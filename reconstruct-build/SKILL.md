@@ -17,15 +17,18 @@ the app code, `reconstruct/build-log.md`, and updates the `clone` column of
 `features.csv`.
 
 ```bash
-python3 contrast.py reconstruct/design/tokens.json     # every text pair, WCAG ratio
+python3 "${CLAUDE_SKILL_DIR}/contrast.py" reconstruct/design/tokens.json     # every text pair, WCAG ratio
 ```
+
+Read `reconstruct/scope.md` first. REA is used only if it records mode B with
+a ticked basis. If it is missing or has no basis, work in mode A and say so.
 
 ## The rules
 
-- **Clean room.** Code is written from the recon map and specs. Never paste
-  the original's HTML, CSS, JS, decompiled code, SVGs, images or fonts. Never
-  load from its domain or CDN. If you opened REA output for a detail, close it
-  and write the behaviour from the spec.
+- **Clean room.** This stage is the clean room. Code is written from
+  `recon.md`, `architecture.md` and the design specs, never from raw REA
+  output. Never paste the original's HTML, CSS, JS, decompiled code, SVGs,
+  images or fonts. Never load from its domain or CDN.
 - **Your words.** Labels, empty states and emails are written fresh. Matching
   what a button does is parity. Matching its sentence is copying.
 - **Tokens only.** No raw hex or pixel values in components.
@@ -41,9 +44,10 @@ Measure from the reference screenshots. Do not guess:
 - **Spacing** (4 or 8 base), **radius**, **shadow**, **motion**, **layout**
   (max width, breakpoints, sidebar, header).
 
-In mode B, an asset catalog or stylesheet REA found (`inspect_asset_catalog`,
-the bundle's CSS) can confirm measured values. Take the numbers, not the
-files. Icons come from an open set (Lucide, Phosphor, SF Symbols).
+In mode B, an asset catalog or stylesheet (`inspect_asset_catalog`, the
+bundle's CSS) can confirm measured values. Get them the same way as any other
+REA question (see "Stuck" below): as numbers, not files. Icons come from an
+open set (Lucide, Phosphor, SF Symbols).
 
 Fill `tokens.json`, add a `pairs` list for every text/background combination,
 run `contrast.py`. Zero AA failures (4.5:1 body, 3:1 large text and UI
@@ -90,9 +94,13 @@ is bigger than it looked.
 ## Stuck on how something works
 
 Mode A: go back to the original as a user (help article, walkthrough, the
-user's account). Mode B: ask a focused REA question through
-`reverse-engineer-anything`, record the Evidence ID in `recon.md`, then write
-your own version from that note.
+user's account).
+
+Mode B: do not open REA yourself. Hand the question to a separate subagent
+that loads `reverse-engineer-anything` and returns only a behaviour note: what
+happens, limits, edge cases, the Evidence ID. It returns no code, pseudocode,
+strings or endpoint paths. Add the note to `recon.md`, then build from the
+note. The agent writing the code never sees the raw output.
 
 ## Output
 

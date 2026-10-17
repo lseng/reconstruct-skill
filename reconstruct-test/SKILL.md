@@ -15,6 +15,9 @@ Reads the flows in `reconstruct/recon.md`. Writes `reconstruct/test-plan.md`,
 `reconstruct/bugs.md`, and specs in the project (`e2e/`). Templates here:
 `test-plan.md`, `bug-report.md`, `e2e.example.spec.ts`.
 
+Read `reconstruct/scope.md` first. REA is used only if it records mode B with
+a ticked basis. If it is missing or has no basis, work in mode A and say so.
+
 ## The rule
 
 **Test the rebuild, not the original.** Never load-test, fuzz or script

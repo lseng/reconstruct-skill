@@ -72,6 +72,23 @@ class Repo(unittest.TestCase):
             _, text = frontmatter(os.path.join(ROOT, s, "SKILL.md"))
             self.assertRegex(text.lower(), r"clean.room|private endpoints|never paste|leak", s)
 
+    def test_stages_that_can_use_rea_check_the_mode_gate(self):
+        for s in ("reconstruct-build", "reconstruct-test", "reconstruct-diff",
+                  "reconstruct-sweep"):
+            _, text = frontmatter(os.path.join(ROOT, s, "SKILL.md"))
+            self.assertIn("Read `reconstruct/scope.md` first", text, s)
+
+    def test_scripts_are_called_through_the_skill_dir(self):
+        # A bare "python3 parity.py" only works from inside the skill folder.
+        bare = []
+        for s in SKILLS:
+            _, text = frontmatter(os.path.join(ROOT, s, "SKILL.md"))
+            for line in text.splitlines():
+                if re.search(r"python3 \S*\.py", line) and "CLAUDE_SKILL_DIR" not in line \
+                        and "$T/" not in line:
+                    bare.append((s, line.strip()))
+        self.assertEqual(bare, [])
+
     def test_no_em_dashes_anywhere(self):
         bad = []
         for dirpath, dirnames, filenames in os.walk(ROOT):

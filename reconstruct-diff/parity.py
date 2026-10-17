@@ -141,20 +141,37 @@ def score(rows):
 
 
 def evidence_report(counted):
-    """Tier counts, rows with no evidence, and must-haves that are guesses."""
+    """Tier counts, rows with no evidence, and must-haves that are guesses.
+
+    Only a REA Evidence ID or an http(s) URL counts as evidence. Anything else
+    in the column is reported as a problem and does not count, so a row of
+    "TODO" fails --require-evidence like an empty one.
+    """
     tiers = {"artifact": 0, "public": 0, "none": 0}
     unsupported = []
     guessed_musts = []
     problems = []
+    column = bool(counted) and all("evidence" in r for r in counted)
+    if counted and not column:
+        problems.append("no 'evidence' column: add evidence and confidence "
+                        "(template: reconstruct-recon/features.csv)")
     for r in counted:
         tokens = [t.strip() for t in r.get("evidence", "").split(";") if t.strip()]
+        ids, urls = [], []
         for t in tokens:
-            if t.startswith("ev_") and not EVIDENCE_ID.match(t):
-                problems.append("line %d: '%s' is not a REA Evidence ID (ev_ + 64 hex)"
+            if EVIDENCE_ID.match(t):
+                ids.append(t)
+            elif t.lower().startswith(("http://", "https://")):
+                urls.append(t)
+            elif t.lower().startswith("ev_"):
+                problems.append("line %d: '%s' is not a REA Evidence ID (ev_ + 64 lowercase hex)"
                                 % (r["line"], t))
-        if any(EVIDENCE_ID.match(t) for t in tokens):
+            else:
+                problems.append("line %d: '%s' is not a URL or a REA Evidence ID"
+                                % (r["line"], t))
+        if ids:
             tiers["artifact"] += 1
-        elif tokens:
+        elif urls:
             tiers["public"] += 1
         else:
             tiers["none"] += 1
@@ -165,7 +182,7 @@ def evidence_report(counted):
                             % (r["line"], r.get("confidence", "")))
         if r["weight"] == 3 and conf == "guess":
             guessed_musts.append(r["feature"])
-    return {"tiers": tiers, "unsupported": unsupported,
+    return {"tiers": tiers, "unsupported": unsupported, "column": column,
             "guessed_musts": guessed_musts}, problems
 
 
@@ -237,8 +254,11 @@ def render(result, markdown=False):
         ev["tiers"]["artifact"], ev["tiers"]["public"], ev["tiers"]["none"]))
     for f in ev["guessed_musts"]:
         out.append("- must-have is only a guess: %s" % f)
-    for f in ev["unsupported"]:
-        out.append("- no evidence: %s" % f)
+    if not ev["column"]:
+        out.append("- no evidence column, so no row is backed (see Fix in the matrix)")
+    else:
+        for f in ev["unsupported"]:
+            out.append("- no evidence: %s" % f)
     if result.get("visual"):
         out.append("")
         out.append("%sScreens" % h)

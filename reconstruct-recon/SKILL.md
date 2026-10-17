@@ -31,10 +31,14 @@ reconstruct/screens/       reference screenshots of the original. Never shipped.
   authorization from the user having a copy installed. Many licences forbid
   reverse engineering, so read the EULA or terms and record what they say. If
   the basis is unclear, stay in tier A and say why.
-- **Clean room in both tiers.** Evidence describes behaviour. It never becomes
-  code. Do not paste decompiled code, bundle code, assets, strings, copy or a
-  third party's private endpoints into the rebuild or into specs the build
-  reads verbatim. Write behaviour in your own words.
+- **Clean room in both tiers. This skill is the dirty room, and `recon.md`
+  is the wall.** Evidence describes behaviour. It never becomes code. Every
+  later stage reads `recon.md`, never raw REA output, so `recon.md` holds
+  behaviour in your own words plus Evidence IDs. It holds no decompiled or
+  bundle code, pseudocode, assets, verbatim strings or copy, and no third
+  party's private endpoints. Exported REA files stay out of the project, or
+  under `reconstruct/evidence/` if they must be kept, and are never committed
+  (add `reconstruct/evidence/` to the project's `.gitignore`).
 - **Reading, not scraping.** No crawlers or bulk downloads against sites. Read
   pages at human speed. The user drives their own account.
 - **Never someone else's account**, never a password, never past a paywall.
@@ -123,7 +127,7 @@ that is only a `guess` gets a probe in Unknowns before anyone builds it.
 Check it:
 
 ```bash
-python3 ../reconstruct-diff/parity.py reconstruct/features.csv
+python3 "${CLAUDE_SKILL_DIR}/../reconstruct-diff/parity.py" reconstruct/features.csv
 ```
 
 The Evidence section lists rows with none.

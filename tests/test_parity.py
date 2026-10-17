@@ -82,7 +82,8 @@ class Score(unittest.TestCase):
         p = write(self.tmp.name, "bad.csv",
                   "feature,priority,clone\nThing,urgent,maybe\n")
         r = parity.score(parity.load(p))
-        self.assertEqual(len(r["problems"]), 2)
+        self.assertEqual(len(r["problems"]), 3)   # priority, clone, no evidence column
+        self.assertTrue(any("no 'evidence' column" in x for x in r["problems"]))
         self.assertEqual(r["feature_score"], 0.0)
 
     def test_missing_column_is_an_error(self):
@@ -115,7 +116,31 @@ class Score(unittest.TestCase):
                   "A,must,yes,ev_123,sure\n")
         r = parity.score(parity.load(p))
         self.assertEqual(len(r["problems"]), 2)
+        self.assertEqual(r["evidence"]["tiers"], {"artifact": 0, "public": 0, "none": 1})
+        self.assertEqual(r["evidence"]["unsupported"], ["A"])
+
+    def test_junk_evidence_does_not_satisfy_require_evidence(self):
+        junk = ["TODO", "ev_BAD", "EV_" + "a" * 64, "see notes", "ev_" + "A" * 64]
+        rows = "".join("R%d,must,yes,%s\n" % (i, t) for i, t in enumerate(junk))
+        p = write(self.tmp.name, "junk.csv", "feature,priority,clone,evidence\n" + rows)
+        r = parity.score(parity.load(p))
+        self.assertEqual(r["evidence"]["tiers"]["none"], len(junk))
+        self.assertEqual(len(r["problems"]), len(junk))
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(parity.main([p, "--require-evidence"]), 1)
+
+    def test_one_valid_token_backs_the_row(self):
+        p = write(self.tmp.name, "mixed.csv",
+                  "feature,priority,clone,evidence\nA,must,yes,TODO;https://x.test/a\n")
+        r = parity.score(parity.load(p))
         self.assertEqual(r["evidence"]["tiers"]["public"], 1)
+        self.assertEqual(len(r["problems"]), 1)
+
+    def test_missing_column_is_one_line_not_a_flood(self):
+        r = parity.combine(parity.score(parity.load(self.path)), [])
+        text = parity.render(r)
+        self.assertIn("no evidence column", text)
+        self.assertNotIn("- no evidence: ", text)
 
     def test_cli_require_evidence(self):
         with redirect_stdout(io.StringIO()):

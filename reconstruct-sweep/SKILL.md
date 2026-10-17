@@ -12,9 +12,12 @@ description: >-
 # reconstruct-sweep
 
 ```bash
-python3 sweep.py . --avoid "Original Name,Its Company" --domains original.com --colors "#006bff"
-python3 sweep.py . --config reconstruct/sweep.json
+python3 "${CLAUDE_SKILL_DIR}/sweep.py" . --avoid "Original Name,Its Company" --domains original.com --colors "#006bff"
+python3 "${CLAUDE_SKILL_DIR}/sweep.py" . --config reconstruct/sweep.json
 ```
+
+Read `reconstruct/scope.md` first. Step 2 applies only if it records mode B
+with a ticked basis.
 
 `reconstruct/sweep.json` holds `avoid`, `domains` and `colors`. The sweep
 searches file contents and names, including inside identifiers (`OriginalEmbed`),
@@ -38,19 +41,21 @@ reproduce by accident:
 - distinctive string constants, error messages, analytics event names
 - private endpoint paths and header names
 
-Add them to `avoid` (or `domains` for hosts). Common words do not belong here
+Pick them in a separate subagent that reads the REA evidence and returns only
+the marker list, so the sweep does not pull raw output into the clean side.
+Add them to `avoid` (or `domains` for hosts and paths). Common words do not belong here
 because they only make noise. A hit is a question to answer, not automatically
 a leak: rename it if it came from the evidence, keep it and note why if it is
 a standard term.
 
 Also check by hand: no files exported from REA sessions (evidence bundles,
-pseudocode dumps, extracted assets) anywhere outside `reconstruct/`, and none
-committed.
+pseudocode dumps, extracted assets) anywhere outside `reconstruct/evidence/`,
+and none committed (`git ls-files reconstruct/evidence` is empty).
 
 ## Step 3: run until clean
 
 ```bash
-python3 sweep.py . --config reconstruct/sweep.json
+python3 "${CLAUDE_SKILL_DIR}/sweep.py" . --config reconstruct/sweep.json
 ```
 
 Fix until it says clean. Then check by eye: favicon, page titles, email
@@ -58,6 +63,8 @@ templates, OG image, app icon.
 
 ## Output
 
-`reconstruct/sweep.json`, a clean sweep (exit 0), and one line in
-`reconstruct/parity.md` recording the date it passed. A rebuild does not ship
-until this is clean.
+`reconstruct/sweep.json` and `reconstruct/sweep-result.md`: the date and time
+of the run, the commit it ran against, the result (clean, or the hits left),
+the mode, and how many clean-room markers were checked. `/reconstruct-diff`
+reads this file for its verdict. A rebuild does not ship until it says clean
+for the current commit.
