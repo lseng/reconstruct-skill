@@ -43,10 +43,12 @@ Number every case: F01-H1, F01-E3, F01-N2.
 
 ## Step 2: the oracle (mode B)
 
-For each must-have flow, capture the original doing it once with a declared
-scenario (`capture_browser_scenario`, `capture_native_ui_scenario` or
-`capture_process_scenario` via `reverse-engineer-anything`). Record the
-Evidence ID next to the case. That capture is what "expected" means. It is
+For each must-have flow, a separate subagent captures the original doing it
+once with a declared scenario (`capture_browser_scenario`,
+`capture_native_ui_scenario` or `capture_process_scenario` via
+`reverse-engineer-anything`). It returns only the Evidence ID and a behaviour
+note of the expected outcome, never the captured payloads. The agent writing
+specs works from that note. Record the Evidence ID next to the case. That capture is what "expected" means. It is
 also the left side of the behaviour diff in `/reconstruct-diff`.
 
 Clean room applies to tests too. Write expected outcomes as behaviour ("a
