@@ -51,6 +51,21 @@ class Repo(unittest.TestCase):
             market = json.load(fh)
         self.assertEqual(market["plugins"][0]["name"], "reconstruct-skill")
 
+    def test_plugin_starts_the_pinned_rea(self):
+        # One pin for the plugin, the README and the doctor, and no env block:
+        # REA rejects an empty GHIDRA_INSTALL_DIR, so it must be inherited.
+        with open(os.path.join(ROOT, ".claude-plugin", "plugin.json")) as fh:
+            rea = json.load(fh)["mcpServers"]["rea"]
+        self.assertEqual(rea["command"], "npx")
+        self.assertEqual(rea["args"][:2], ["-y", "rea-agents@6.5.0"])
+        self.assertEqual(rea["args"][2:], ["mcp"])
+        self.assertNotIn("env", rea)
+        pinned = "npx -y %s mcp" % rea["args"][1]
+        with open(os.path.join(ROOT, "README.md"), encoding="utf-8") as fh:
+            self.assertIn(pinned, fh.read())
+        with open(os.path.join(ROOT, "reconstruct-recon", "doctor.py"), encoding="utf-8") as fh:
+            self.assertIn('REA = "%s"' % rea["args"][1], fh.read())
+
     def test_readme_lists_every_skill(self):
         with open(os.path.join(ROOT, "README.md"), encoding="utf-8") as fh:
             readme = fh.read()

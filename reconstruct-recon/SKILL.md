@@ -44,6 +44,20 @@ reconstruct/screens/       reference screenshots of the original. Never shipped.
 - **Never someone else's account**, never a password, never past a paywall.
 - **Screenshots are reference.** They stay in `reconstruct/screens/`.
 
+## Step 0: check the tools
+
+```bash
+python3 "${CLAUDE_SKILL_DIR}/doctor.py"
+```
+
+It reports Python, Node and npx, whether the REA MCP server starts, REA's own
+skill, and Ghidra and Java (optional), with the install command for each gap.
+Show the user what is missing. Tier A needs only Python, so carry on in tier A
+whatever else it says. Tier B needs every `[mode B]` line ok, and the REA tools
+present in this session: if the doctor passes but they are not, the server is
+registered but not loaded, so ask the user to restart Claude Code or check
+`/mcp`.
+
 ## Step 1: scope and mode
 
 Ask, or propose answers and get a yes:

@@ -1,7 +1,7 @@
 {
   "name": "reconstruct-skill",
   "description": "Six Claude skills that rebuild an app from evidence: two-tier recon (public sources, plus REA on authorized artifacts), architecture, build, test, evidence-checked parity diff, and a clean-room sweep.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "Leon Eng"
   },
@@ -15,6 +15,16 @@
     "clean-room"
   ],
   "skills": "./",
+  "mcpServers": {
+    "rea": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "rea-agents@6.5.0",
+        "mcp"
+      ]
+    }
+  },
   "homepage": "https://github.com/lseng/reconstruct-skill",
   "repository": "https://github.com/lseng/reconstruct-skill"
 }

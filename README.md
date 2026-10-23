@@ -46,29 +46,74 @@ As a plugin in Claude Code:
 /plugin install reconstruct-skill@reconstruct-skill
 ```
 
-They show up as `/reconstruct-skill:reconstruct-recon` and so on. To get plain
-`/reconstruct-recon` instead, copy the folders:
+That installs the six skills and registers the REA MCP server, which runs
+`npx -y rea-agents@6.5.0 mcp`. npx fetches REA from npm the first time it
+starts (a few hundred MB, cached after that). Restart Claude Code, then check:
+
+```
+claude mcp list        # plugin:reconstruct-skill:rea ... Connected
+```
+
+The skills show up as `/reconstruct-skill:reconstruct-recon` and so on. If you
+already registered REA yourself with a different command, you will have two
+copies of its tools: remove yours (`claude mcp remove rea`) or disable the
+plugin's in `/mcp`.
+
+From a clone instead, which gives plain `/reconstruct-recon`:
 
 ```bash
-cp -r reconstruct-* ~/.claude/skills/
+git clone https://github.com/lseng/reconstruct-skill
+cp -r reconstruct-skill/reconstruct-* ~/.claude/skills/
+claude mcp add -s user rea -- npx -y rea-agents@6.5.0 mcp
+```
+
+For mode B, also install REA's own skill, which these skills hand REA tool
+choice to (the plugin does not ship it):
+
+```bash
+npx -y rea-agents@6.5.0 setup --skill-client claude_code --yes
+```
+
+Then check everything:
+
+```bash
+python3 reconstruct-skill/reconstruct-recon/doctor.py   # /reconstruct-recon runs this as step 0
 ```
 
 ### Requirements
 
-- Python 3.8+ for the tools. Nothing to pip install.
-- Mode B only: the REA MCP server and its `reverse-engineer-anything` skill.
-  Written against `rea-agents` 6.5.0. Check with `rea --version`. These skills
-  hand all REA tool choice, setup and recovery to that skill and do not copy it.
+- Python 3.8+ for the tools. Nothing to pip install. Mode A needs nothing else.
+- Mode B: Node 22.19+, 24.11+ or 26+ with npx, for REA (`rea-agents` 6.5.0,
+  pinned). The plugin starts it for you; a clone needs the `claude mcp add`
+  line above.
+- Optional, for native binaries: Ghidra 12.1 and Java 21. REA starts without
+  them. When `GHIDRA_INSTALL_DIR` (and `JAVA_HOME` if Java is not on the
+  path) is set in the shell that starts Claude Code, the REA server inherits
+  it and uses Ghidra. With Homebrew:
+
+  ```bash
+  brew install ghidra openjdk@21
+  export GHIDRA_INSTALL_DIR="$(brew --prefix ghidra)/libexec"
+  ```
+
+  Set it to a real absolute path or leave it unset: REA refuses to start
+  when it is set to an empty or relative value. For a clone you can pin it on
+  the server instead: `claude mcp add -s user rea -e GHIDRA_INSTALL_DIR=/path/to/ghidra -- npx -y rea-agents@6.5.0 mcp`.
+- If npx cannot fetch from your npm registry (a private mirror that needs a
+  login, for example), `doctor.py` says so. Log in to it, or point npm at
+  `https://registry.npmjs.org/`.
 
 ## The tools
 
-All standard-library Python, none touch the network.
+All standard-library Python. Only `doctor.py` touches the network, when it
+starts REA through npx (`--offline` skips that).
 
 ```bash
 python3 reconstruct-diff/parity.py reconstruct/features.csv --require-evidence  # parity + evidence gaps
 python3 reconstruct-diff/imgdiff.py original.png rebuild.png --out diff.png     # layout diff, ignores colour
 python3 reconstruct-build/contrast.py reconstruct/design/tokens.json            # WCAG contrast on tokens
 python3 reconstruct-sweep/sweep.py . --config reconstruct/sweep.json            # anything of the original left?
+python3 reconstruct-recon/doctor.py                                             # node, npx, REA MCP, REA skill, Ghidra
 ```
 
 What changed from Replica's versions:
@@ -89,7 +134,8 @@ python3 -m unittest discover -s tests -v
 
 MIT. Pipeline, templates and `imgdiff.py`, `parity.py`, `sweep.py`,
 `contrast.py` are adapted from Replica by Jake Schincariol (MIT). REA
-(`rea-agents`, MIT) is a separate install and is not bundled. See `NOTICE`.
+(`rea-agents`, MIT) is not bundled: the plugin's MCP entry runs it from npm
+at runtime, and none of its code is in this repo. See `NOTICE`.
 
 Not legal advice. Before mode B on anything you do not own, check the licence
 and get a real answer on whether you may reverse engineer it.

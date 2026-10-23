@@ -30,4 +30,5 @@ MIT License
   SOFTWARE.
 
 REA (rea-agents, https://github.com/morluto/rea), MIT License, is referenced
-and not bundled. Install it separately.
+and not bundled. The plugin manifest starts it with npx, which installs it from
+npm at runtime; none of its code is in this repository.
